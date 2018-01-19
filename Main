@@ -1,0 +1,13 @@
+package automation.selenium.assignment2;
+
+public class Main {
+
+	public static void main(String[] args) {
+		System.setProperty("webdriver.chrome.driver",
+				"F:\\chrome\\chromedriver.exe");
+
+		RailwayTrainScheduler obj = new RailwayTrainScheduler();
+		obj.executeRailWayTrainScheduler();
+	}
+
+}
