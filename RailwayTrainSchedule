@@ -1,0 +1,167 @@
+package automation.selenium.assignment2;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class RailwayTrainScheduler {
+
+	WebDriver driver = new ChromeDriver();
+	WebDriverWait wait = new WebDriverWait(driver, 30);
+
+	public void executeRailWayTrainScheduler() {
+		invokeBrowser();
+		searchTrain();
+		readSearchResults();
+		readTicketPrice();
+		driver.close();
+	}
+
+	public void invokeBrowser() {
+		driver.manage().deleteAllCookies();
+		driver.manage().window().maximize();
+		driver.get(" https://www.eservices.railway.gov.lk/schedule/homeAction.action?lang=en");
+	}
+
+	public void searchTrain() {
+		WebElement startStation;
+		startStation = wait.until(ExpectedConditions.elementToBeClickable(By
+				.id("startStation")));
+		startStation.sendKeys("DEMATAGODA");
+
+		driver.findElement(By.id("endStation")).sendKeys("COLOMBO FORT");
+		driver.findElement(By.id("startTime")).sendKeys("12:00:00");
+		driver.findElement(By.id("endTime")).sendKeys("15:00:00");
+		driver.findElement(
+				By.xpath("//form[@id='search_form_id']/div/div[7]/div/button[1]"))
+				.click();
+	}
+
+	public void readSearchResults() {
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		int row_count = driver
+				.findElements(
+						By.xpath("//div[@id='es-content']/div[6]/div/div/table/tbody/tr"))
+				.size();
+		
+		int column_count = driver
+				.findElements(
+						By.xpath("//div[@id='es-content']/div[6]/div/div/table/thead/tr/th"))
+				.size();
+		
+		/* Print search results table header */
+		for (int i = 2; i <= 4; i++) {
+			String first_xpath_header = "//div[@id='es-content']/div[6]/div/div/table/thead/tr/th[";
+			String second_xpath_header = "]";
+			String final_xpath_header = first_xpath_header + i
+					+ second_xpath_header;
+
+			String table_header_data = driver.findElement(
+					By.xpath(final_xpath_header)).getText();
+			System.out.print(table_header_data + "   ");
+		}
+		/* Ignore 'End Station / Time' and 'Name' columns from the table header */
+		for (int i = 6; i <= column_count; i = i + 2) {
+			String first_xpath = "//div[@id='es-content']/div[6]/div/div/table/thead/tr/th[";
+			String second_xpath = "]";
+			String final_xpath = first_xpath + i + second_xpath;
+
+			String table_header_data = driver
+					.findElement(By.xpath(final_xpath)).getText();
+			System.out.print(table_header_data + "   ");
+		}
+		System.out.print("Train No");
+		System.out.println("");
+
+		/* Print Train details */
+		for (int i = 1; i < row_count; i = i + 3) {
+			for (int j = 2; j <= 4; j++) {
+				String first_path = "//div[@id='es-content']/div[6]/div/div/table/tbody/tr[";
+				String second_path = "]/td[";
+				String third_path = "]";
+				String final_path = first_path + i + second_path + j
+						+ third_path;
+
+				String table_cell_data = driver.findElement(
+						By.xpath(final_path)).getText();
+				System.out.print(table_cell_data + "\t");
+			}
+
+			/* Ignore table data from 'End Station / Time' and 'Name' */
+			for (int j = 6; j <= column_count; j = j + 2) {
+				String first_path = "//div[@id='es-content']/div[6]/div/div/table/tbody/tr[";
+				String second_path = "]/td[";
+				String third_path = "]";
+				String final_path = first_path + i + second_path + j
+						+ third_path;
+
+				String table_cell_data = driver.findElement(
+						By.xpath(final_path)).getText();
+				System.out.print(table_cell_data + "\t");
+			}
+
+			/* Print Train No */
+			String first_xpath_trainNo = "//div[@id='es-content']/div[6]/div/div/table/tbody/tr[";
+			String second_xpath_trainNo = "]/td[3]";
+			String final_xpath_trinNo = first_xpath_trainNo + (i + 1)
+					+ second_xpath_trainNo;
+
+			String train_no = driver.findElement(By.xpath(final_xpath_trinNo))
+					.getText();
+			System.out.println(train_no + "\t");
+		}
+		System.out.println();
+	}
+
+	public void readTicketPrice() {
+		System.out.println(driver.findElement(
+				By.xpath("//div[@id='es-content']/div[7]/h4")).getText());
+
+		int ticketPrice_rows = driver.findElements(
+				By.xpath("//div[@id='es-content']/div[7]/table/tbody/tr"))
+				.size();
+
+		int ticketPrice_columns = driver
+				.findElements(
+						By.xpath("//div[@id='es-content']/div[7]/table/tbody/tr[1]/td"))
+				.size();
+
+		/* Printing ticket prices table header */
+		for (int i = 1; i <= ticketPrice_columns; i++) {
+			String first_xpath_header = "//div[@id='es-content']/div[7]/table/thead/tr/th[";
+			String second_xpath_header = "]";
+			String final_xpath_header = first_xpath_header + i
+					+ second_xpath_header;
+
+			String ticket_prices_header = driver.findElement(
+					By.xpath(final_xpath_header)).getText();
+			System.out.print(ticket_prices_header + "\t");
+		}
+		System.out.println();
+
+		/* Printing ticket price table data */
+		for (int i = 1; i < ticketPrice_rows; i++) {
+			for (int j = 1; j <= ticketPrice_columns; j++) {
+				String first_xpath = "//div[@id='es-content']/div[7]/table/tbody/tr[";
+				String second_xpath = "]/td[";
+				String third_xpath = "]";
+				String final_xpath = first_xpath + i + second_xpath + j
+						+ third_xpath;
+
+				String ticket_price_table_data = driver.findElement(
+						By.xpath(final_xpath)).getText();
+				System.out.print(ticket_price_table_data + "\t");
+			}
+			System.out.println();
+		}
+	}
+}
